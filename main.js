@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const template = require('./menubar');
+const dns = require('dns');
 
 let mainWindow;
 
@@ -19,7 +20,16 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadURL('https://chess.com'); // Load external website
+    // Check for internet connection
+    dns.lookup('chess.com', (err) => {
+        if (err) {
+            // If no internet, load offline.html
+            mainWindow.loadFile(path.join(__dirname, 'offline.html'));
+        } else {
+            // If internet is available, load chess.com
+            mainWindow.loadURL('https://chess.com');
+        }
+    });
 
     mainWindow.on('closed', () => {
         mainWindow = null;

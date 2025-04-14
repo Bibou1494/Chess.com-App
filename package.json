@@ -1,7 +1,20 @@
 {
   "name": "chess.com",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "main.js",
+  "build": {
+    "appId": "com.biboucorp.chesscomapp",
+    "productName": "ChessCom App",
+    "copyright": "© 2025  BibouCorp",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis":{
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
@@ -10,7 +23,7 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "This is my Chess.com app, since chess.com doesn't have a desktop app, I made my own.",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1"
   },
@@ -23,6 +36,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.7.0",
     "@electron-forge/plugin-fuses": "^7.7.0",
     "@electron/fuses": "^1.8.0",
-    "electron": "^34.2.0"
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
   }
 }

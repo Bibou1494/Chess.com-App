@@ -29,9 +29,9 @@ const template = [
   {
     label: 'Edit',
     submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
-      { type: 'separator' },
+      // { role: 'undo' },
+      // { role: 'redo' },
+      // { type: 'separator' },
       { role: 'cut' },
       { role: 'copy' },
       { role: 'paste' },
@@ -62,13 +62,21 @@ const template = [
     submenu: [
       { role: 'reload' },
       { role: 'forceReload' },
-      { role: 'toggleDevTools' },
       { type: 'separator' },
       { role: 'resetZoom' },
       { role: 'zoomIn' },
       { role: 'zoomOut' },
       { type: 'separator' },
-      { role: 'togglefullscreen' }
+      { role: 'togglefullscreen' },
+      { type: 'separator' },
+      {
+        label: 'Go Back',
+        click: (menuItem, browserWindow) => {
+          if (browserWindow && browserWindow.webContents.canGoBack()) {
+            browserWindow.webContents.goBack();
+          }
+        }
+      }
     ]
   },
   // { role: 'windowMenu' }
@@ -96,7 +104,7 @@ const template = [
         label: 'Learn More',
         click: async () => {
           const { shell } = require('electron')
-          await shell.openExternal('https://github.com/Bibou1494/')
+          await shell.openExternal('https://github.com/Bibou1494/Chess.com-App')
         }
       }
     ]
