@@ -70,6 +70,15 @@ const template = [
       { role: 'togglefullscreen' },
       { type: 'separator' },
       {
+        label: 'Toggle Developer Tools',
+        accelerator: 'Ctrl+Shift+I', // Shortcut for toggling dev tools
+        click: (menuItem, browserWindow) => {
+          if (browserWindow) {
+            browserWindow.webContents.toggleDevTools();
+          }
+        }
+      },
+      {
         label: 'Go Back',
         click: (menuItem, browserWindow) => {
           if (browserWindow && browserWindow.webContents.canGoBack()) {
@@ -103,8 +112,15 @@ const template = [
       {
         label: 'Learn More',
         click: async () => {
-          const { shell } = require('electron')
-          await shell.openExternal('https://github.com/Bibou1494/Chess.com-App')
+          const { shell } = require('electron');
+          await shell.openExternal('https://github.com/Bibou1494/Chess.com-App');
+        }
+      },
+      {
+        label: 'Check For Updates',
+        click: () => {
+          const { autoUpdater } = require('electron-updater');
+          autoUpdater.checkForUpdatesAndNotify();
         }
       }
     ]

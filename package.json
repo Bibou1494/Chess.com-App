@@ -1,6 +1,6 @@
 {
   "name": "chess.com",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "main.js",
   "build": {
     "appId": "com.biboucorp.chesscomapp",
@@ -10,9 +10,14 @@
       "target": "nsis",
       "icon": "assets/icon.ico"
     },
-    "nsis":{
+    "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Bibou1494",
+      "repo": "Chess.com-App"
     }
   },
   "scripts": {
@@ -25,7 +30,8 @@
   "license": "ISC",
   "description": "This is my Chess.com app, since chess.com doesn't have a desktop app, I made my own.",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "electron-updater": "^6.6.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.7.0",

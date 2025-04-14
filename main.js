@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const template = require('./menubar');
 const dns = require('dns');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 
@@ -44,6 +45,25 @@ app.whenReady().then(() => {
             createWindow();
         }
     });
+
+    // Check for updates
+    autoUpdater.checkForUpdatesAndNotify();
+});
+
+autoUpdater.on('update-available', () => {
+    console.log('Update available!');
+});
+
+autoUpdater.on('update-not-available', () => {
+    console.log('No updates available.');
+});
+
+autoUpdater.on('error', (err) => {
+    console.error('Error checking for updates:', err);
+});
+
+autoUpdater.on('update-downloaded', () => {
+    console.log('Update downloaded. It will be installed on restart.');
 });
 
 app.on('window-all-closed', () => {
