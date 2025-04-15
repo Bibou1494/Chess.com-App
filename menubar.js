@@ -1,62 +1,21 @@
-// const isMac = process.platform === 'darwin';
+const { dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
 
 const template = [
-  // { role: 'appMenu' }
-  // ...(isMac
-  //   ? [{
-  //       label: app.name,
-  //       submenu: [
-  //         { role: 'about' },
-  //         { type: 'separator' },
-  //         { role: 'services' },
-  //         { type: 'separator' },
-  //         { role: 'hide' },
-  //         { role: 'hideOthers' },
-  //         { role: 'unhide' },
-  //         { type: 'separator' },
-  //         { role: 'quit' }
-  //       ]
-  //     }]
-  //   : []),
-  // { role: 'fileMenu' }
   {
     label: 'File',
     submenu: [
       { role: 'close' }
     ]
   },
-  // { role: 'editMenu' }
   {
     label: 'Edit',
     submenu: [
-      // { role: 'undo' },
-      // { role: 'redo' },
-      // { type: 'separator' },
       { role: 'cut' },
       { role: 'copy' },
-      { role: 'paste' },
-      // ...(isMac
-      //   ? [
-      //       { role: 'pasteAndMatchStyle' },
-      //       { role: 'delete' },
-      //       { role: 'selectAll' },
-      //       { type: 'separator' },
-      //       {
-      //         label: 'Speech',
-      //         submenu: [
-      //           { role: 'startSpeaking' },
-      //           { role: 'stopSpeaking' }
-      //         ]
-      //       }
-      //     ]
-      //   : [
-      //       { role: 'delete' },
-      //       { type: 'separator' },
-      //       { role: 'selectAll' }
-      //     ])
+      { role: 'paste' }
     ]
   },
-  // { role: 'viewMenu' }
   {
     label: 'View',
     submenu: [
@@ -88,22 +47,11 @@ const template = [
       }
     ]
   },
-  // { role: 'windowMenu' }
   {
     label: 'Window',
     submenu: [
       { role: 'minimize' },
-      { role: 'zoom' },
-      // ...(isMac
-      //   ? [
-      //       { type: 'separator' },
-      //       { role: 'front' },
-      //       { type: 'separator' },
-      //       { role: 'window' }
-      //     ]
-      //   : [
-      //       { role: 'close' }
-      //     ])
+      { role: 'zoom' }
     ]
   },
   {
@@ -119,12 +67,43 @@ const template = [
       {
         label: 'Check For Updates',
         click: () => {
-          const { autoUpdater } = require('electron-updater');
-          autoUpdater.checkForUpdatesAndNotify();
+          autoUpdater.checkForUpdates();
+
+          // Notify when an update is available
+          autoUpdater.on('update-available', () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'Update Available',
+              message: 'An update is available and is being downloaded.'
+            });
+          });
+
+          // Notify when no updates are available
+          autoUpdater.on('update-not-available', () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'No Updates',
+              message: 'Your application is up-to-date.'
+            });
+          });
+
+          // Handle errors
+          autoUpdater.on('error', (err) => {
+            dialog.showErrorBox('Update Error', `An error occurred while checking for updates: ${err.message}`);
+          });
+
+          // Notify when the update is downloaded
+          autoUpdater.on('update-downloaded', () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'Update Ready',
+              message: 'Update downloaded. It will be installed on restart.'
+            });
+          });
         }
       }
     ]
   }
-]
+];
 
 module.exports = template;

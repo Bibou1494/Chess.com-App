@@ -49,10 +49,12 @@ app.whenReady().then(() => {
             createWindow();
         }
     });
-    
-    autoUpdater.checkForUpdatesAndNotify();
+
+    // Silent update check on startup
+    autoUpdater.checkForUpdates();
 });
 
+// Show dialog only when an update is available
 autoUpdater.on('update-available', () => {
     console.log('Update available!');
     dialog.showMessageBox({
@@ -62,20 +64,17 @@ autoUpdater.on('update-available', () => {
     });
 });
 
+// Do not show dialog when no updates are available
 autoUpdater.on('update-not-available', () => {
     console.log('No updates available.');
-    dialog.showMessageBox({
-        type: 'info',
-        title: 'No Updates',
-        message: 'Your application is up-to-date.',
-    });
 });
 
+// Handle errors silently unless triggered manually
 autoUpdater.on('error', (err) => {
     console.error('Error checking for updates:', err);
-    dialog.showErrorBox('Update Error', 'An error occurred while checking for updates. Please check the logs for more details.');
 });
 
+// Notify when the update is downloaded
 autoUpdater.on('update-downloaded', () => {
     console.log('Update downloaded. It will be installed on restart.');
     dialog.showMessageBox({
