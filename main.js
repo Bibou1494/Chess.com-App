@@ -5,6 +5,44 @@ const dns = require('dns');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
+const DiscordRPC = require('discord-rpc');
+const ID = '1363192169254486096'; // Ensure this is the correct Client ID
+const RPC = new DiscordRPC.Client({ transport: 'ipc' });
+
+// Discord RPC
+DiscordRPC.register(ID);
+
+async function activity() {
+    if (!RPC) return;
+
+    console.log("Setting Discord activity...");
+    RPC.setActivity({
+        details: 'Playing Chess',
+        instance: false,
+        startTimestamp: Date.now(),
+    }).catch(err => {
+        console.error("Error setting activity:", err);
+    });
+}
+
+RPC.on('ready', async () => {
+    console.log("RPC Presence up");
+    activity();
+});
+
+RPC.on('error', (err) => {
+    console.error("Discord RPC Error:", err);
+});
+
+RPC.login({ clientId: ID })
+    .then(() => {
+        console.log("Logged into Discord RPC successfully.");
+    })
+    .catch(err => {
+        console.error("Error logging into Discord RPC:", err);
+    });
+
+
 let mainWindow;
 
 const menu = Menu.buildFromTemplate(template)
