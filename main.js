@@ -5,8 +5,10 @@ const dns = require('dns');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
+require('dotenv').config()
+
 const DiscordRPC = require('discord-rpc');
-const ID = '1363192169254486096'; // Ensure this is the correct Client ID
+const ID = (process.env.ID);
 const RPC = new DiscordRPC.Client({ transport: 'ipc' });
 
 // Discord RPC
@@ -51,6 +53,83 @@ Menu.setApplicationMenu(menu)
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 
+function setRPCForURL(url, playerNames, pageTitle) {
+    if (!RPC) return;
+    let details = 'Browsing Chess.com';
+    if (url.includes('/play/online')) {
+        details = 'Playing Online Chess';
+    } else if (url.includes('/play/computer')) {
+        details = 'Playing vs Computer';
+    } else if(url.includes('/game/live')) {
+        if (pageTitle) {
+            const match = pageTitle.match(/^Chess: (.+? vs .+?) -/);
+            if (match && match[1]) {
+                details = `Replaying ${match[1]}`;
+            } else {
+                details = 'Replaying a Chess Game';
+            }
+        } else {
+            details = 'Replaying a Chess Game';
+        }
+    } else if (url.includes('/puzzles')) {
+        details = 'Solving Puzzles';
+    } else if (url.includes('/lessons')) {
+        details = 'Learning Chess';
+    } else if (url.includes('/analysis')) {
+        details = 'Analyzing a Game';
+    } else if (url.includes('/news')) {
+        details = 'Reading Chess News';
+    } else if (url.includes('/live')) {
+        details = 'Watching Live Chess';
+    } else if (url.includes('/game')) {
+        // Use playerNames from preload if available
+        if (playerNames && playerNames.player1 && playerNames.player2) {
+            details = `Playing ${playerNames.player1} vs ${playerNames.player2}`;
+        } else {
+            details = 'Playing a Chess Game';
+        }
+    }
+    let buttons = undefined;
+    if(url.includes('/game/live')) {
+        let gameUrl = url;
+        // If the url is not a full URL, prepend https://www.chess.com
+        if (!gameUrl.startsWith('http')) {
+            gameUrl = 'https://www.chess.com' + gameUrl;
+        }
+        buttons = [
+            {
+                label: 'View Game on Chess.com',
+                url: gameUrl
+            }
+        ];
+    }
+    RPC.setActivity({
+        details,
+        instance: false,
+        startTimestamp: Date.now(),
+        buttons
+    }).catch(err => {
+        console.error('Error setting activity:', err);
+    });
+}
+
+const { ipcMain } = require('electron');
+let lastLiveGameURL = null;
+let lastPlayerNames = null;
+let lastPageTitle = null;
+ipcMain.on('chesscom-player-names', (event, playerNames) => {
+    if (lastLiveGameURL) {
+        lastPlayerNames = playerNames;
+        setRPCForURL(lastLiveGameURL, playerNames, lastPageTitle);
+    }
+});
+ipcMain.on('chesscom-page-title', (event, pageTitle) => {
+    if (lastLiveGameURL) {
+        lastPageTitle = pageTitle;
+        setRPCForURL(lastLiveGameURL, lastPlayerNames, pageTitle);
+    }
+});
+
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1280,
@@ -60,6 +139,7 @@ function createWindow() {
         autoHideMenuBar: true,  // Automatically hide the menu bar
         webPreferences: {
             nodeIntegration: true,
+            preload: path.join(__dirname, 'preload.js'),
         }
     });
 
@@ -71,6 +151,36 @@ function createWindow() {
         } else {
             // If internet is available, load chess.com
             mainWindow.loadURL('https://chess.com');
+        }
+    });
+
+    mainWindow.webContents.on('did-navigate', (event, url) => {
+        if (url.includes('/game/live')) {
+            lastLiveGameURL = url;
+            lastPlayerNames = null;
+            lastPageTitle = null;
+            setRPCForURL(url, lastPlayerNames, lastPageTitle);
+            // Ask renderer to send page title
+            mainWindow.webContents.send('chesscom-request-title');
+        } else {
+            lastLiveGameURL = null;
+            lastPlayerNames = null;
+            lastPageTitle = null;
+            setRPCForURL(url);
+        }
+    });
+    mainWindow.webContents.on('did-navigate-in-page', (event, url) => {
+        if (url.includes('/game/live')) {
+            lastLiveGameURL = url;
+            lastPlayerNames = null;
+            lastPageTitle = null;
+            setRPCForURL(url, lastPlayerNames, lastPageTitle);
+            mainWindow.webContents.send('chesscom-request-title');
+        } else {
+            lastLiveGameURL = null;
+            lastPlayerNames = null;
+            lastPageTitle = null;
+            setRPCForURL(url);
         }
     });
 
