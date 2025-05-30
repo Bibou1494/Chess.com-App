@@ -1,12 +1,12 @@
 {
   "name": "chess.com",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "main": "main.js",
   "build": {
     "appId": "com.biboucorp.chesscomapp",
     "productName": "ChessCom App",
     "win": {
-      "icon": "Images/icon.ico"
+      "icon": "assets/icon.ico"
     },
     "publish": {
       "provider": "github",
@@ -25,6 +25,7 @@
   "description": "This is my Chess.com app, since chess.com doesn't have a desktop app, I made my own.",
   "dependencies": {
     "discord-rpc": "^4.0.1",
+    "dotenv": "^16.5.0",
     "electron-log": "^5.3.3",
     "electron-squirrel-startup": "^1.0.1",
     "electron-updater": "^6.6.2"
