@@ -5,10 +5,8 @@ const dns = require('dns');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
-require('dotenv').config()
-
 const DiscordRPC = require('discord-rpc');
-const ID = (process.env.ID);
+const ID = '1363192169254486096';
 const RPC = new DiscordRPC.Client({ transport: 'ipc' });
 
 // Discord RPC
@@ -139,6 +137,7 @@ function createWindow() {
         autoHideMenuBar: true,  // Automatically hide the menu bar
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false, // Disable context isolation for compatibility
             preload: path.join(__dirname, 'preload.js'),
         }
     });
